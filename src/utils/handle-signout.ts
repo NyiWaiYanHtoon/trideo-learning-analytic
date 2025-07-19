@@ -11,6 +11,6 @@ export const handleSignOut = async (router: Router) => {
 
     router.push('/Auth');
   } catch (err) {
-    console.error('Sign out failed', err);
+    console.log('Sign out failed', err);
   }
 };

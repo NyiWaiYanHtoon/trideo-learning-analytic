@@ -9,6 +9,7 @@ import AdminLayout from "@/components/AdminLayout.vue";
 const routes = [
   {
     path: "/",
+    redirect: '/home',
     component: Layout,
     children: [
       {
