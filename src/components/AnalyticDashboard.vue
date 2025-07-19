@@ -58,7 +58,7 @@ const timeframe = ref<TTimeFrame>('today');
     <!-- Stats Sections -->
     <OverallStats :timeframe="timeframe" />
     <VideoStats :timeframe="timeframe" />
-    <UserStatsTable :timeframe="timeframe" />
+    <UserStatsTable/>
 
     <!-- Upload Dialog -->
     <UploadDialog v-model:show="showDialog" />

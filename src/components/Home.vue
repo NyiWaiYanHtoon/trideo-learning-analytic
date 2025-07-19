@@ -1,109 +1,110 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import SimplePaginition from './SimplePaginition.vue';
+import DebounceSearch from './DebounceSearch.vue';
+import { produceToKafka } from '@/utils/produce-kafka-topic';
+import { useRouter } from 'vue-router';
 
-const videos = [
-  {
-    id: 1,
-    url: 'video1.mp4',
-    title: 'First Video',
-    description: 'This is the first video.'
-  },
-  {
-    id: 2,
-    url: 'video2.mp4',
-    title: 'Second Video',
-    description: 'This is the second video.'
-  },
-  {
-    id: 3,
-    url: 'video3.mp4',
-    title: 'Third Video',
-    description: 'This is the third video.'
-  },
-  {
-    id: 4,
-    url: 'video3.mp4',
-    title: 'Fourth Video',
-    description: 'This is another video.'
-  },
-  {
-    id: 5,
-    url: 'video3.mp4',
-    title: 'Fifth Video',
-    description: 'Another interesting video.'
-  },
-  {
-    id: 6,
-    url: 'video3.mp4',
-    title: 'Sixth Video',
-    description: 'Informative content here.'
-  },
-  {
-    id: 7,
-    url: 'video3.mp4',
-    title: 'Seventh Video',
-    description: 'Keep watching more content.'
-  },
-  {
-    id: 8,
-    url: 'video4.mp4',
-    title: 'Eighth Video',
-    description: 'Final video in the list.'
-  },
-  {
-    id: 5,
-    url: 'video3.mp4',
-    title: 'Fifth Video',
-    description: 'Another interesting video.'
-  },
-  {
-    id: 6,
-    url: 'video3.mp4',
-    title: 'Sixth Video',
-    description: 'Informative content here.'
-  },
-  {
-    id: 7,
-    url: 'video3.mp4',
-    title: 'Seventh Video',
-    description: 'Keep watching more content.'
-  },
-  {
-    id: 8,
-    url: 'video4.mp4',
-    title: 'Eighth Video',
-    description: 'Final video in the list.'
+const router = useRouter();
+const videos = ref<any[]>([]);
+const total = ref(0);
+const page = ref(1);
+const pageSize = 12;
+const search = ref('');
+const loading = ref(false);
+const error = ref('');
+
+const fetchVideos = async () => {
+  loading.value = true;
+  error.value = '';
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/videos?page=${page.value}&search=${search.value}`,
+      { method: 'GET' }
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to fetch videos. Status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    videos.value = data.videos;
+    total.value = data.total;
+  } catch (err: any) {
+    console.error('Failed to fetch videos:', err);
+    error.value = 'Something went wrong while loading videos. Please try again.';
+    videos.value = [];
+    total.value = 0;
+  } finally {
+    loading.value = false;
   }
-];
+};
 
- const page= ref(1);
- const setPage= (newPage: number)=>{
-  page.value=  newPage;
- }
+onMounted(fetchVideos);
+watch(page, fetchVideos);
+watch(search, () => {
+  page.value = 1;
+  fetchVideos();
+});
 
+const setPage = (newPage: number) => {
+  page.value = newPage;
+};
+
+const handleClick = async (videoId: string) => {
+  await produceToKafka('video-visit', videoId);
+  router.push({ name: 'Video', params: { id: videoId } });
+};
 </script>
+
 <template>
+  <!-- Search -->
+  <DebounceSearch v-model:search="search" placeholder="search videos..."/>
+
+  <!-- Skeleton Loader -->
+  <div
+    v-if="loading"
+    class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-6 py-5"
+  >
+    <div
+      v-for="n in pageSize"
+      :key="n"
+      class="rounded-xs border border-[#333] bg-[#1e1e1e] shadow animate-pulse"
+    >
+      <div class="aspect-video bg-gray-700"></div>
+      <div class="p-2 space-y-2">
+        <div class="h-4 bg-gray-600 rounded w-3/4"></div>
+        <div class="h-3 bg-gray-600 rounded w-full"></div>
+        <div class="h-3 bg-gray-600 rounded w-5/6"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div v-if="error && !loading" class="text-center text-red-500 my-30">
+    {{ error }}
+  </div>
+
   <!-- Video Grid -->
-  <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-6 py-5">
+  <div
+    v-else-if="videos.length"
+    class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-6 py-5"
+  >
     <router-link
       v-for="video in videos"
       :key="video.id"
       :to="{ name: 'Video', params: { id: video.id } }"
+      @click="handleClick(video.id)"
       class="group rounded-xs overflow-hidden border border-[#333] bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-all shadow hover:shadow-md hover:-translate-y-1"
     >
-      <!-- Thumbnail -->
       <div class="aspect-video bg-black overflow-hidden">
         <img
-          src="/images/example_thumbnail.png"
+          :src="video.thumbnailUrl || '/images/example_thumbnail.png'"
           alt="Video thumbnail"
           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
-
-      <!-- Content -->
       <div class="p-2">
-        <h3 class="text-base font-semibold text-white group-hover:text-blue-400 truncate">
+        <h3 class="text-base font-semibold text-white group-hover:text-purple-400 truncate">
           {{ video.title }}
         </h3>
         <p class="text-sm text-gray-400 mt-1 line-clamp-2">
@@ -113,15 +114,19 @@ const videos = [
     </router-link>
   </div>
 
+  <!-- Empty State -->
+  <div v-else-if="!loading && !error" class="text-center text-gray-400 mt-6">
+    No videos found.
+  </div>
+
   <!-- Pagination -->
-  <div class="flex justify-center my-2">
+  <div class="flex justify-center my-2" v-if="total > pageSize && !loading && !error">
     <SimplePaginition
       :page="page"
       :setPage="setPage"
       :disableBack="page <= 1"
-      :disableForward="page >= 5"
-      :isDark="false"
+      :disableForward="page >= Math.ceil(total / pageSize)"
+      :isDark="true"
     />
   </div>
 </template>
-

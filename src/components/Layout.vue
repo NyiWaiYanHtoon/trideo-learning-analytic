@@ -2,7 +2,7 @@
 import Navbar from './Navbar.vue'
 </script>
 <template>
-    <div class="min-h-screen flex flex-col p-5">
+    <div class="min-h-screen flex flex-col bg-black text-white p-5">
         <div class="mb-8">
             <Navbar username="Joey" />
         </div>
