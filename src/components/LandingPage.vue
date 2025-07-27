@@ -1,3 +1,12 @@
+<script>
+import { useRouter } from 'vue-router';
+
+  const router= useRouter();
+  const handleBrowse= ()=>{
+    router.push('/home')
+  }
+</script>
+
 <template>
   <div class="bg-gray-950 text-white font-sans min-h-[82vh] flex flex-col">
     <!-- Hero Section -->
@@ -19,8 +28,9 @@
           Node.js, Next.js Flutter and more. Learn and build job-ready skills, faster.
         </p>
         <button
-          class="bg-purple-600 hover:bg-purple-700 transition-colors text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-md"
-        >
+          class="bg-purple-600 hover:bg-purple-700 transition-colors text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-md cursor-pointer"
+          @click="handleBrowse"
+          >
           Start Learning Now
         </button>
       </div>
