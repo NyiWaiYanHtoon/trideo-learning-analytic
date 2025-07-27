@@ -56,7 +56,7 @@ const handleEnded = async () => {
       </h2>
 
       <!-- Description -->
-      <div class="bg-gray-900 text-gray-300 p-4 rounded-xl text-sm leading-relaxed">
+      <div class="bg-gray-800/70 border border-gray-700 shadow-md p-4 rounded-xl text-sm leading-relaxed">
         <h3 class="font-medium text-purple-400 mb-2 text-base">Description</h3>
         <p class="whitespace-pre-wrap">
           {{ video.description }}

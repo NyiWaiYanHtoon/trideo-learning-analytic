@@ -40,7 +40,7 @@ const user = ref<{ id: string, role?: string } | null>(null)
 
 const fetchUserAndVideo = async () => {
   const data = await getUser()
-  user.value = data // include role if needed
+  user.value = data
 
   if (!videoId) return
 
@@ -124,16 +124,11 @@ const handleDislike = async () => {
 const handleDelete = async () => {
   if (!selectedVideo.value) return
   try {
-    console.log("about to delete");
     const res = await fetch(`${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/videos/delete`, {
-  method: 'DELETE',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    videoId: selectedVideo.value?.id,
-  }),
-})
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ videoId: selectedVideo.value?.id })
+    })
     if (res.ok) {
       router.push('/home')
     } else {
@@ -147,9 +142,8 @@ const handleDelete = async () => {
 
 <template>
   <div v-if="!isLoading && !isError && selectedVideo"
-    class="grid gap-10 md:grid-cols-[1fr_5fr] items-start px-20 py-15 min-h-screen bg-black text-white">
-    
-    <!-- Sidebar -->
+    class="grid gap-10 md:grid-cols-[1fr_5fr] items-start px-4 sm:px-10 py-12 min-h-screen bg-gray-950 text-white">
+
     <aside class="space-y-6 pt-4">
       <h1 class="text-2xl font-bold leading-tight">
         {{ selectedVideo.title }}
@@ -210,7 +204,6 @@ const handleDelete = async () => {
         </span>
       </div>
 
-      <!-- Delete Button (optional: check role === 'admin') -->
       <button
         v-if="user && user.role=='admin'"
         @click="handleDelete"
@@ -221,14 +214,12 @@ const handleDelete = async () => {
       </button>
     </aside>
 
-    <!-- Video Player -->
     <section class="w-full rounded-xl overflow-hidden">
       <VideoPlayer :video="selectedVideo" />
     </section>
   </div>
 
-  <!-- Skeleton Loading -->
-  <div v-else-if="isLoading" class="grid grid-cols-[1fr_5fr] gap-10 px-20 py-15 min-h-screen bg-black text-white animate-pulse">
+  <div v-else-if="isLoading" class="grid grid-cols-[1fr_5fr] gap-10 px-4 sm:px-10 py-12 min-h-screen bg-[#0b0b0b] text-white animate-pulse">
     <aside class="space-y-6 pt-4">
       <div class="h-6 bg-gray-800 rounded w-3/4"></div>
       <div class="h-4 bg-gray-700 rounded w-2/3"></div>
@@ -243,8 +234,7 @@ const handleDelete = async () => {
     <section class="bg-gray-800 w-full h-96 rounded-xl"></section>
   </div>
 
-  <!-- Error State -->
-  <div v-else class="flex justify-center items-center h-[90vh] text-gray-400 text-lg">
+  <div v-else class="flex justify-center items-center h-[90vh] text-gray-400 text-lg bg-[#0b0b0b]">
     Failed to load video. Please try again later.
   </div>
 </template>

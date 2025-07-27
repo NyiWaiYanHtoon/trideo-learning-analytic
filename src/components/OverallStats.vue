@@ -55,52 +55,38 @@ const completionRate = computed(() =>
 </script>
 
 <template>
-  <div class="w-full px-6 py-8 text-white space-y-6">
+  <div class="w-full px-2 sm:px-6 py-8 text-white space-y-6">
     <!-- Loading Skeleton -->
-    <div
-      v-if="loading"
-      class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 animate-pulse"
-    >
-      <div
-        v-for="n in 5"
-        :key="n"
-        class="bg-[#1e1e1e] border border-[#333] rounded-xl p-5 shadow"
-      >
-        <div class="h-4 bg-gray-600 w-1/3 mb-2 rounded"></div>
-        <div class="h-6 bg-gray-700 w-2/3 rounded"></div>
+    <div v-if="loading" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
+      <div v-for="n in 5" :key="n" class="bg-gray-800/70 border border-gray-700 rounded-2xl p-6 shadow-inner">
+        <div class="h-4 bg-gray-600/70 w-1/3 mb-3 rounded"></div>
+        <div class="h-6 bg-gray-700/80 w-2/3 rounded"></div>
       </div>
     </div>
 
-    <!-- Error State -->
+    <!-- Error Message -->
     <div v-else-if="error" class="text-center text-red-400 text-lg">
       Failed to load statistics. Please try again later.
     </div>
 
-    <!-- Stats Display -->
+    <!-- Stats -->
     <div v-else-if="stats" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl p-5 shadow">
-        <h3 class="text-sm text-gray-400 mb-1">Visited</h3>
-        <p class="text-2xl font-semibold text-white">{{ stats?.visits }}</p>
-      </div>
-
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl p-5 shadow">
-        <h3 class="text-sm text-gray-400 mb-1">Viewed</h3>
-        <p class="text-2xl font-semibold text-white">{{ stats.views }}</p>
-      </div>
-
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl p-5 shadow">
-        <h3 class="text-sm text-gray-400 mb-1">Completed</h3>
-        <p class="text-2xl font-semibold text-white">{{ stats.completions }}</p>
-      </div>
-
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl p-5 shadow">
-        <h3 class="text-sm text-gray-400 mb-1">View Rate</h3>
-        <p class="text-2xl font-semibold text-white">{{ viewRate }}%</p>
-      </div>
-
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl p-5 shadow">
-        <h3 class="text-sm text-gray-400 mb-1">Completion Rate</h3>
-        <p class="text-2xl font-semibold text-white">{{ completionRate }}%</p>
+      <div v-for="(value, key) in [
+          { title: 'Visited', value: stats.visits },
+          { title: 'Viewed', value: stats.views },
+          { title: 'Completed', value: stats.completions },
+          { title: 'View Rate', value: viewRate + '%' },
+          { title: 'Completion Rate', value: completionRate + '%' }
+        ]"
+        :key="value.title"
+        class="bg-gray-800/70 border border-gray-700 rounded-2xl p-6 shadow-md hover:shadow-lg transition"
+      >
+        <h3 class="text-sm text-gray-400 mb-1 tracking-wide uppercase">
+          {{value.title }}
+        </h3>
+        <p class="text-3xl font-bold text-white tracking-tight">
+          {{ value.value }}
+        </p>
       </div>
     </div>
   </div>

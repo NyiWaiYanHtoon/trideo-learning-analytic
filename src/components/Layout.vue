@@ -2,9 +2,9 @@
 import Navbar from './Navbar.vue'
 </script>
 <template>
-    <div class="min-h-screen flex flex-col bg-black text-white p-5">
-        <div class="mb-8">
-            <Navbar username="Joey" />
+    <div class="min-h-screen flex flex-col bg-gray-950 text-white">
+        <div class="mb-20">
+            <Navbar/>
         </div>
         <main class="flex-1">
             <router-view />

@@ -287,7 +287,7 @@ const handleUpload = async () => {
 
         <!-- Thumbnail Upload -->
         <div>
-          <label class="block mb-2 text-sm font-medium">Thumbnail</label>
+          <label class="block mv-2 text-sm font-medium">Thumbnail</label>
           <input
             type="file"
             accept="image/*"

@@ -1,25 +1,23 @@
 <script setup lang="ts">
-import { ref, watch, defineEmits, defineProps } from 'vue';
+import { ref, watch, defineEmits, defineProps } from 'vue'
 
-// Define optional prop for placeholder
 const props = defineProps<{
-  placeholder?: string;
-}>();
+  placeholder?: string
+}>()
 
-// Emit search updates
 const emit = defineEmits<{
-  (e: 'update:search', value: string): void;
-}>();
+  (e: 'update:search', value: string): void
+}>()
 
-const input = ref('');
-let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+const input = ref('')
+let debounceTimeout: ReturnType<typeof setTimeout> | null = null
 
 watch(input, (newValue) => {
-  if (debounceTimeout) clearTimeout(debounceTimeout);
+  if (debounceTimeout) clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {
-    emit('update:search', newValue);
-  }, 500);
-});
+    emit('update:search', newValue)
+  }, 500)
+})
 </script>
 
 <template>
@@ -28,7 +26,7 @@ watch(input, (newValue) => {
       v-model="input"
       type="text"
       :placeholder="props.placeholder || 'Search...'"
-      class="w-full p-3 rounded-md bg-[#1f1f1f] border border-[#333] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white placeholder-gray-400"
     />
   </div>
 </template>

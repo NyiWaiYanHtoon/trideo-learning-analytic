@@ -145,17 +145,21 @@ onMounted(() => fetchTopVideos())
 </script>
 
 <template>
-  <div class="w-full p-6 grid grid-cols-[4fr_1fr] gap-4">
-    <!-- Chart Section -->
-    <div class="flex flex-col bg-[#1e1e1e] rounded-xl p-6 shadow-inner border border-[#2c2c2c] min-h-[400px]">
-      <div v-if="isLoadingChart" class="text-center text-purple-300 animate-pulse">Loading chart...</div>
-      <div v-else-if="chartError" class="text-center text-red-400 mt-30">{{ chartError }}</div>
+  <div class="w-full xl:grid gap-6 xl:grid-cols-[2fr_1fr] p-6">
+    <!-- Chart Panel -->
+    <div class="bg-[#1e1e1e] rounded-xl border border-[#2f2f2f] p-4 shadow">
+      <h2 class="text-lg font-semibold text-purple-400 mb-4">Video Engagement Chart</h2>
+
+      <div v-if="isLoadingChart" class="text-center text-purple-300 animate-pulse py-12">
+        Loading chart...
+      </div>
+      <div v-else-if="chartError" class="text-center text-red-400">{{ chartError }}</div>
       <Bar v-else :data="chartData" :options="chartOptions" />
 
-      <div class="flex justify-end mt-6">
+      <div v-if="totalVideos > 5" class="mt-4">
         <SimplePaginition
           :page="page"
-          :setPage="(p: number) => (page = p)"
+          :setPage="p => page = p"
           :disableBack="page <= 1"
           :disableForward="page >= Math.ceil(totalVideos / 5)"
           :isDark="true"
@@ -163,55 +167,33 @@ onMounted(() => fetchTopVideos())
       </div>
     </div>
 
-    <!-- Lists Section -->
-    <div class="space-y-8">
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl shadow p-5">
-        <h2 class="text-2xl font-semibold text-white mb-4 pb-2">
-          Most Viewed Videos
-        </h2>
-
-        <div v-if="isLoadingList" class="text-center text-purple-300 animate-pulse">Loading list...</div>
+    <!-- Sidebar Lists -->
+    <div class="space-y-6 md:mt-0 mt-4">
+      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl shadow p-4">
+        <h3 class="text-md font-bold text-white mb-2">Most Viewed</h3>
+        <div v-if="isLoadingList" class="text-purple-300 animate-pulse text-center">Loading...</div>
         <div v-else-if="listError" class="text-red-400">{{ listError }}</div>
-        <ul v-else class="space-y-3 max-h-[320px] overflow-y-auto">
-          <li
-            v-for="video in mostViewedVideos"
-            :key="video.id"
-            class="flex items-center gap-4 hover:bg-purple-900 rounded p-2 cursor-pointer transition-colors"
-          >
-            <img :src="video.thumbnailUrl" alt="thumbnail" class="w-20 h-12 object-cover rounded" />
-            <div class="flex flex-col text-gray-300">
-              <p class="font-semibold">{{ video.title }}</p>
-              <p class="text-xs text-gray-400">
-                Uploaded on {{ new Date(video.createdAt).toLocaleDateString() }}
-              </p>
+        <ul v-else class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+          <li v-for="video in mostViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded">
+            <img :src="video.thumbnailUrl" alt="thumb" class="w-16 h-10 object-cover rounded" />
+            <div>
+              <p class="text-sm font-semibold text-white truncate">{{ video.title }}</p>
+              <p class="text-xs text-gray-400">{{ new Date(video.createdAt).toLocaleDateString() }}</p>
             </div>
           </li>
-          <li v-if="mostViewedVideos.length === 0" class="text-gray-400 text-sm text-center">No data.</li>
         </ul>
       </div>
 
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl shadow p-5">
-        <h2 class="text-2xl font-semibold text-white mb-4 pb-2">
-          Least Viewed Videos
-        </h2>
-
-        <div v-if="isLoadingList" class="text-center text-purple-300 animate-pulse">Loading list...</div>
-        <div v-else-if="listError" class="text-red-400">{{ listError }}</div>
-        <ul v-else class="space-y-3 max-h-[320px] overflow-y-auto">
-          <li
-            v-for="video in leastViewedVideos"
-            :key="video.id"
-            class="flex items-center gap-4 hover:bg-purple-900 rounded p-2 cursor-pointer transition-colors"
-          >
-            <img :src="video.thumbnailUrl" alt="thumbnail" class="w-20 h-12 object-cover rounded" />
-            <div class="flex flex-col text-gray-300">
-              <p class="font-semibold">{{ video.title }}</p>
-              <p class="text-xs text-gray-400">
-                Uploaded on {{ new Date(video.createdAt).toLocaleDateString() }}
-              </p>
+      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl shadow p-4">
+        <h3 class="text-md font-bold text-white mb-2">Least Viewed</h3>
+        <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+          <li v-for="video in leastViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded">
+            <img :src="video.thumbnailUrl" alt="thumb" class="w-16 h-10 object-cover rounded" />
+            <div>
+              <p class="text-sm font-semibold text-white truncate">{{ video.title }}</p>
+              <p class="text-xs text-gray-400">{{ new Date(video.createdAt).toLocaleDateString() }}</p>
             </div>
           </li>
-          <li v-if="leastViewedVideos.length === 0" class="text-gray-400 text-sm text-center">No data.</li>
         </ul>
       </div>
     </div>

@@ -24,23 +24,21 @@ const goForward = () => {
 
 const buttonClasses = computed(() =>
   props.isDark
-    ? 'bg-[#1e1e1e] hover:bg-[#2a2a2a] border border-[#444] text-white'
-    : 'bg-transparent hover:bg-gray-300 text-gray-800'
+    ? 'bg-gray-800 border border-gray-700 text-white hover:bg-gray-700'
+    : 'bg-white border border-gray-300 text-gray-800 hover:bg-gray-100'
 )
 
 const pageTextClass = computed(() =>
-  props.isDark ? 'text-white bg-[#1a1a1a]' : 'text-gray-800 bg-transparent'
+  props.isDark
+    ? 'text-purple-400 font-semibold bg-gray-900 border border-gray-700 px-4 py-1 rounded-md'
+    : 'text-gray-800 bg-white border border-gray-300 px-4 py-1 rounded-md'
 )
-
-console.log(buttonClasses.value, "@@");
-console.log(pageTextClass.value, "@@");
-
 </script>
 
 <template>
-  <div class="flex justify-center items-center gap-5 mt-6">
+  <div class="flex justify-center items-center gap-4 mt-6">
     <button
-      class="flex items-center justify-center w-8 h-8 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
+      class="flex items-center justify-center w-9 h-9 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
       :class="buttonClasses"
       :disabled="disableBack"
       @click="goBack"
@@ -48,15 +46,12 @@ console.log(pageTextClass.value, "@@");
       <ChevronLeft class="w-4 h-4" />
     </button>
 
-    <span
-      class="text-sm font-medium px-4 py-1 rounded-md"
-      :class="pageTextClass"
-    >
+    <span :class="pageTextClass">
       {{ page }}
     </span>
 
     <button
-      class="flex items-center justify-center w-8 h-8 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
+      class="flex items-center justify-center w-9 h-9 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
       :class="buttonClasses"
       :disabled="disableForward"
       @click="goForward"

@@ -58,7 +58,7 @@ const handleClick = async (videoId: string) => {
 
 <template>
   <!-- Search -->
-  <DebounceSearch v-model:search="search" placeholder="search videos..."/>
+  <DebounceSearch v-model:search="search" placeholder="Search videos..." />
 
   <!-- Skeleton Loader -->
   <div
@@ -68,10 +68,10 @@ const handleClick = async (videoId: string) => {
     <div
       v-for="n in pageSize"
       :key="n"
-      class="rounded-xs border border-[#333] bg-[#1e1e1e] shadow animate-pulse"
+      class="rounded-xl bg-gray-800 shadow-inner animate-pulse"
     >
-      <div class="aspect-video bg-gray-700"></div>
-      <div class="p-2 space-y-2">
+      <div class="aspect-video bg-gray-700 rounded-t-xl"></div>
+      <div class="p-4 space-y-3">
         <div class="h-4 bg-gray-600 rounded w-3/4"></div>
         <div class="h-3 bg-gray-600 rounded w-full"></div>
         <div class="h-3 bg-gray-600 rounded w-5/6"></div>
@@ -80,7 +80,7 @@ const handleClick = async (videoId: string) => {
   </div>
 
   <!-- Error State -->
-  <div v-if="error && !loading" class="text-center text-red-500 my-30">
+  <div v-if="error && !loading" class="text-center text-red-400 mt-10">
     {{ error }}
   </div>
 
@@ -94,7 +94,7 @@ const handleClick = async (videoId: string) => {
       :key="video.id"
       :to="{ name: 'Video', params: { id: video.id } }"
       @click="handleClick(video.id)"
-      class="group rounded-xs overflow-hidden border border-[#333] bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-all shadow hover:shadow-md hover:-translate-y-1"
+      class="group overflow-hidden bg-gray-800 hover:bg-gray-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-1"
     >
       <div class="aspect-video bg-black overflow-hidden">
         <img
@@ -103,7 +103,7 @@ const handleClick = async (videoId: string) => {
           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
-      <div class="p-2">
+      <div class="p-4">
         <h3 class="text-base font-semibold text-white group-hover:text-purple-400 truncate">
           {{ video.title }}
         </h3>
@@ -120,7 +120,10 @@ const handleClick = async (videoId: string) => {
   </div>
 
   <!-- Pagination -->
-  <div class="flex justify-center my-2" v-if="total > pageSize && !loading && !error">
+  <div
+    class="flex justify-center my-8"
+    v-if="total > pageSize && !loading && !error"
+  >
     <SimplePaginition
       :page="page"
       :setPage="setPage"
@@ -130,3 +133,4 @@ const handleClick = async (videoId: string) => {
     />
   </div>
 </template>
+

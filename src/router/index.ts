@@ -5,27 +5,40 @@ import Layout from "../components/Layout.vue";
 import Video from "../components/Video.vue";
 import AnalyticDashboard from "@/components/AnalyticDashboard.vue";
 import AdminLayout from "@/components/AdminLayout.vue";
+import LandingPage from "@/components/LandingPage.vue";
+import { getUser } from "@/utils/get-user";
 
 const routes = [
+  { 
+    path: "/Auth", 
+    name: "Auth", 
+    component: Auth,
+    meta: { requiresAuth: false }
+  },
   {
     path: "/",
-    redirect: '/home',
     component: Layout,
     children: [
+      {
+        path: "/",
+        name: "LandingPage",
+        component: LandingPage,
+        meta: { requiresAuth: false },
+      },
       {
         path: "/home",
         name: "Home",
         component: Home,
         meta: { requiresAuth: true },
       },
+      {
+        path: "/video/:id",
+        name: "Video",
+        component: Video,
+        props: true,
+        meta: { requiresAuth: true },
+      },
     ],
-  },
-  {
-    path: "/video/:id",
-    name: "Video",
-    component: Video,
-    props: true,
-    meta: { requiresAuth: true },
   },
   {
     path: "/admin",
@@ -39,8 +52,7 @@ const routes = [
         meta: { requiresAuth: true },
       },
     ],
-  },
-  { path: "/Auth", name: "Auth", component: Auth },
+  }
 ];
 
 const router = createRouter({
@@ -53,23 +65,14 @@ router.beforeEach(async (to, from, next) => {
 
   if (requiresAuth) {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/auth/me`,
-        {
-          credentials: "include",
-        }
-      );
-      if (!res.ok) return next("/Auth");
-
-      const data = await res.json();
-      const userRole = data.user?.role;
-
-      //if it is admin routes
+      const user= await getUser()
+      if (!user) return next("/Auth");
+      
       if (to.fullPath.startsWith("/admin")) {
-        if (userRole === "admin") {
+        if (user.dbUser.role === "admin") {
           return next();
         } else {
-          return next("/home");
+          return next("/");
         }
       }
       return next();
