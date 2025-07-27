@@ -13,7 +13,7 @@ import {
   Trash2
 } from 'lucide-vue-next'
 import { format } from 'date-fns'
-import { getUser } from '@/utils/get-user'
+import { getUser, type TUser } from '@/utils/get-user'
 
 interface Video {
   id: string;
@@ -36,7 +36,7 @@ const videoId = Array.isArray(route.params.id) ? route.params.id[0] : route.para
 const selectedVideo = ref<Video | null>(null)
 const isLoading = ref(false)
 const isError = ref(false)
-const user = ref<{ id: string, role?: string } | null>(null)
+const user = ref<TUser | null>(null)
 
 const fetchUserAndVideo = async () => {
   const data = await getUser()
@@ -81,13 +81,13 @@ const formattedDuration = computed(() => {
 
 const userLiked = computed(() =>
   user.value && selectedVideo.value?.likes
-    ? selectedVideo.value.likes.users.includes(user.value.id)
+    ? selectedVideo.value.likes.users.includes(user.value.dbUser.id)
     : false
 )
 
 const userDisliked = computed(() =>
   user.value && selectedVideo.value?.dislikes
-    ? selectedVideo.value.dislikes.users.includes(user.value.id)
+    ? selectedVideo.value.dislikes.users.includes(user.value.dbUser.id)
     : false
 )
 
@@ -97,7 +97,7 @@ const handleLike = async () => {
     const res = await fetch(`${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ videoId: selectedVideo.value.id, userId: user.value.id }),
+      body: JSON.stringify({ videoId: selectedVideo.value.id, userId: user.value.dbUser.id }),
     })
     const data = await res.json()
     if (res.ok && data.data) selectedVideo.value.likes = data.data
@@ -112,7 +112,7 @@ const handleDislike = async () => {
     const res = await fetch(`${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/dislike`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ videoId: selectedVideo.value.id, userId: user.value.id }),
+      body: JSON.stringify({ videoId: selectedVideo.value.id, userId: user.value.dbUser.id }),
     })
     const data = await res.json()
     if (res.ok && data.data) selectedVideo.value.dislikes = data.data
@@ -205,7 +205,7 @@ const handleDelete = async () => {
       </div>
 
       <button
-        v-if="user && user.role=='admin'"
+        v-if="user && user.dbUser.role=='admin'"
         @click="handleDelete"
         class="flex items-center gap-2 bg-rose-600 text-white px-3 py-2 rounded hover:bg-rose-700 transition"
       >

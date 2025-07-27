@@ -1,4 +1,4 @@
-type TUser= {
+export type TUser= {
     dbUser: {
         id: string;
         email: string;

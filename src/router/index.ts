@@ -6,7 +6,7 @@ import Video from "../components/Video.vue";
 import AnalyticDashboard from "@/components/AnalyticDashboard.vue";
 import AdminLayout from "@/components/AdminLayout.vue";
 import LandingPage from "@/components/LandingPage.vue";
-import { getUser } from "@/utils/get-user";
+import { getUser, type TUser } from "@/utils/get-user";
 
 const routes = [
   { 
@@ -65,7 +65,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (requiresAuth) {
     try {
-      const user= await getUser()
+      const user: TUser | null= await getUser()
       if (!user) return next("/Auth");
       
       if (to.fullPath.startsWith("/admin")) {

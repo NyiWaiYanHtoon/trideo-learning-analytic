@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { getUser } from "@/utils/get-user";
+import { getUser, type TUser } from "@/utils/get-user";
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import UserAvatar from "./UserAvatar.vue";
 
-const user = ref();
+const user = ref<TUser | null>(null);
 const username = ref< string | undefined >("");
 const profileUrl= ref <string | undefined > ("")
 const userRole = ref < string | undefined >("user");
