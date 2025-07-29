@@ -12,7 +12,7 @@ import { useRouter } from 'vue-router';
 <template>
   <div class="bg-gray-950 text-white font-sans min-h-[82vh] flex flex-col">
     <!-- Hero Section -->
-    <section class="py-24 px-6 text-center flex-grow">
+    <section class="py-11 px-6 text-center flex-grow">
       <div class="max-w-3xl mx-auto space-y-8">
         <img
           src="../../public/images/landing-image.svg"
