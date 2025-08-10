@@ -18,6 +18,7 @@ export async function produceToKafka(topic: "video-visit" | "video-view" | "vide
         }),
       });
       if(!res.ok) return console.log(res.status, "error producing kafka topic");
+      console.log("prodecuced topic: ", topic);
     } catch (err) {
       console.error("Failed to send Kafka visit event", err);
     }

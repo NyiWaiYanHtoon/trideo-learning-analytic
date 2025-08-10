@@ -69,11 +69,12 @@ router.beforeEach(async (to, from, next) => {
       if (!user) return next("/Auth");
       
       if (to.fullPath.startsWith("/admin")) {
-        if (user.dbUser.role === "admin") {
-          return next();
-        } else {
-          return next("/");
-        }
+        // if (user.dbUser.role === "admin") {
+        //   return next();
+        // } else {
+        //   return next("/");
+        // }
+        // commented for demo (give admin access to all users)
       }
       return next();
     } catch (err) {

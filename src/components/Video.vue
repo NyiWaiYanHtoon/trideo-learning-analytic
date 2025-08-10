@@ -10,7 +10,9 @@ import {
   Eye,
   Tag,
   Folder,
-  Trash2
+  Trash2,
+  CheckCircle,
+  Navigation
 } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { getUser, type TUser } from '@/utils/get-user'
@@ -28,6 +30,8 @@ interface Video {
   likes: { id: string, count: number; users: string[], videoId: string } | null;
   dislikes: { id: string, count: number; users: string[], videoId: string } | null;
   views: number;
+  visits: number;
+  completes: number;
 }
 
 const route = useRoute()
@@ -93,14 +97,16 @@ const userDisliked = computed(() =>
 
 const handleLike = async () => {
   if (!user.value || !selectedVideo.value) return
+  const userId = user.value.dbUser.id;
+  const videoId = selectedVideo.value.id;
   try {
     const res = await fetch(`${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ videoId: selectedVideo.value.id, userId: user.value.dbUser.id }),
+      body: JSON.stringify({ videoId, userId}),
     })
     const data = await res.json()
-    if (res.ok && data.data) selectedVideo.value.likes = data.data
+    if (res.ok && data.data) return selectedVideo.value.likes = data.data
   } catch (error) {
     console.error('Error liking video:', error)
   }
@@ -108,11 +114,14 @@ const handleLike = async () => {
 
 const handleDislike = async () => {
   if (!user.value || !selectedVideo.value) return
+  const userId = user.value.dbUser.id;
+  const videoId = selectedVideo.value.id;
+  
   try {
     const res = await fetch(`${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/dislike`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ videoId: selectedVideo.value.id, userId: user.value.dbUser.id }),
+      body: JSON.stringify({ videoId, userId: user.value.dbUser.id }),
     })
     const data = await res.json()
     if (res.ok && data.data) selectedVideo.value.dislikes = data.data
@@ -122,7 +131,7 @@ const handleDislike = async () => {
 }
 
 const handleDelete = async () => {
-  if (!selectedVideo.value) return
+  if (!selectedVideo.value) return;
   try {
     const res = await fetch(`${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/videos/delete`, {
       method: 'DELETE',
@@ -160,7 +169,22 @@ const handleDelete = async () => {
           <Clock class="w-4 h-4 text-indigo-400" />
           <span class="italic text-gray-500">{{ formattedDuration }}</span>
         </li>
-        <li class="flex items-center gap-2">
+        <!-- Conditionally show counts -->
+        <li v-if="user?.dbUser.role === 'admin'" class="flex flex-col space-y-1 text-gray-400">
+          <div class="flex items-center gap-2">
+            <Navigation class="w-4 h-4 text-indigo-400" />
+            <span>{{ selectedVideo.visits.toLocaleString() }} visits</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Eye class="w-4 h-4 text-indigo-400" />
+            <span>{{ selectedVideo.views.toLocaleString() }} views</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <CheckCircle class="w-4 h-4 text-indigo-400" />
+            <span>{{ selectedVideo.completes.toLocaleString() }} completes</span>
+          </div>
+        </li>
+        <li v-else class="flex items-center gap-2">
           <Eye class="w-4 h-4 text-indigo-400" />
           <span>{{ selectedVideo.views.toLocaleString() }} views</span>
         </li>
@@ -204,8 +228,9 @@ const handleDelete = async () => {
         </span>
       </div>
 
+      <!-- Show Delete button only for admin -->
       <button
-        v-if="user && user.dbUser.role=='admin'"
+        v-if="user?.dbUser.role === 'admin'"
         @click="handleDelete"
         class="flex items-center gap-2 bg-rose-600 text-white px-3 py-2 rounded hover:bg-rose-700 transition"
       >

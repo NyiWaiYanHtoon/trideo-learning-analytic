@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { Upload, AlertTriangle, Loader2 } from "lucide-vue-next";
-import { POSITION, useToast } from "vue-toastification";
+import { Upload, AlertTriangle } from "lucide-vue-next";
+import { toast } from "vue-sonner";
+import { useRouter } from 'vue-router';
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 const props = defineProps<{
   show: boolean;
@@ -11,8 +13,7 @@ const emit = defineEmits<{
   (e: "update:show", value: boolean): void;
 }>();
 
-const toast = useToast();
-
+const router = useRouter();
 const title = ref("");
 const description = ref("");
 const selectedFile = ref<File | null>(null);
@@ -92,7 +93,14 @@ const handleUpload = async () => {
     !title.value ||
     !description.value
   ) {
-    alert("Please select a valid video file and thumbnail image.");
+    toast.message("Error", {
+        description: "Please put in video, thumbnail, title and description",
+        style: {
+          color: "#f87171",
+          fontWeight: "600",
+          fontSize: '13px'
+        },
+      });
     return;
   }
 
@@ -122,79 +130,71 @@ const handleUpload = async () => {
         {
           method: "POST",
           body: formData,
+          credentials: "include",
         }
       );
-      if (!response.ok) throw new Error("Something went wrong!");
-      toast.success("Video uploaded successfully!", {
-        position: POSITION.TOP_RIGHT,
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message);
+      }
+      const uploaded = await response.json()
+      toast.message("Success!", {
+        description: "Your video was uploaded successfully.",
+        style: {
+          color: "#4ade80",
+          fontWeight: "600",
+          fontSize: '13px'
+        },
+        action: {
+          label: "View",
+          onClick: () => {
+            router.push(`/video/${uploaded.video.id}`)
+          },
+        },
       });
       emit("update:show", false);
-      // reset fields
       title.value = "";
       description.value = "";
       selectedFile.value = null;
       thumbnailFile.value = null;
       tags.value = "";
       category.value = "";
-    } catch (error) {
-      console.error(error);
-      toast.error("Upload failed!", { position: POSITION.TOP_RIGHT });
+    } catch (error: any) {
+      toast.message("Error", {
+        description: error.message,
+        style: {
+          color: "#f87171",
+          fontWeight: "600",
+          fontSize: '13px'
+        },
+      });
     } finally {
       loading.value = false;
     }
   };
-
   video.src = URL.createObjectURL(selectedFile.value);
 };
 </script>
 
 <template>
-  <div
-    v-if="show"
-    class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4"
-  >
-    <div
-      class="bg-[#212121] text-white w-full max-w-xl p-6 rounded-2xl relative"
-    >
-      <button
-        class="absolute top-3 right-4 text-2xl text-white hover:text-gray-300"
-        @click="emit('update:show', false)"
-        :disabled="loading"
-      >
+  <div v-if="show" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
+    <div class="bg-[#212121] text-white w-full max-w-xl p-6 rounded-2xl relative">
+      <button class="absolute top-3 right-4 text-2xl text-white hover:text-gray-300" @click="emit('update:show', false)"
+        :disabled="loading">
         &times;
       </button>
 
       <form @submit.prevent="handleUpload" class="space-y-2">
         <!-- Video Upload -->
-        <div
-          class="flex flex-col items-center p-6 transition-colors border-2 border-dashed rounded-xl mt-5"
-          :class="
-            isDragging
-              ? 'border-blue-500 bg-[#2a2a2a]'
-              : 'border-gray-600 bg-[#2a2a2a]'
-          "
-          @dragover.prevent="isDragging = true"
-          @dragleave="isDragging = false"
-          @drop="handleDrop"
-        >
-          <div
-            class="w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-colors"
-            :class="isDragging ? 'bg-blue-600' : 'bg-[#333]'"
-          >
-            <svg
-              v-if="loading"
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-10 h-10 text-gray-300 animate-bounce"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M5 15l7-7 7 7"
-              />
+        <div class="flex flex-col items-center p-6 transition-colors border-2 border-dashed rounded-xl mt-5" :class="isDragging
+          ? 'border-blue-500 bg-[#2a2a2a]'
+          : 'border-gray-600 bg-[#2a2a2a]'
+          " @dragover.prevent="isDragging = true" @dragleave="isDragging = false" @drop="handleDrop">
+          <div class="w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-colors"
+            :class="isDragging ? 'bg-blue-600' : 'bg-[#333]'">
+            <svg v-if="loading" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 animate-bounce"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
             </svg>
             <Upload v-else-if="!loading" class="w-10 h-10 text-gray-300" />
           </div>
@@ -209,75 +209,48 @@ const handleUpload = async () => {
           <p v-if="selectedFile" class="italic text-sm mt-3">
             {{ selectedFile.name }}
           </p>
-          <p
-            v-if="errorMsg"
-            class="text-yellow-500 text-sm mt-2 flex items-center gap-1"
-          >
+          <p v-if="errorMsg" class="text-yellow-500 text-sm mt-2 flex items-center gap-1">
             <AlertTriangle class="w-4 h-4" />
             <span>{{ errorMsg }}</span>
           </p>
 
-          <label
-            class="bg-white text-black text-sm px-6 py-2 rounded-full hover:bg-gray-200 cursor-pointer mt-5"
-          >
+          <label class="bg-white text-black text-sm px-6 py-2 rounded-full hover:bg-gray-200 cursor-pointer mt-5">
             Select file
-            <input
-              ref="fileInput"
-              type="file"
-              accept="video/*"
-              class="hidden"
-              @change="handleFileChange"
-              :disabled="loading"
-            />
+            <input ref="fileInput" type="file" accept="video/*" class="hidden" @change="handleFileChange"
+              :disabled="loading" />
           </label>
         </div>
 
         <!-- Title -->
         <div>
           <label class="block mb-1 text-sm font-medium">Title</label>
-          <input
-            v-model="title"
-            type="text"
+          <input v-model="title" type="text"
             class="w-full rounded-lg border border-gray-600 bg-[#2c2c2c] px-3 py-2 text-white focus:outline-none focus:ring focus:border-blue-500"
-            placeholder="Video title"
-            :disabled="loading"
-          />
+            placeholder="Video title" :disabled="loading" />
         </div>
 
         <!-- Description -->
         <div>
           <label class="block mb-1 text-sm font-medium">Description</label>
-          <textarea
-            v-model="description"
-            rows="3"
+          <textarea v-model="description" rows="3"
             class="w-full rounded-lg border border-gray-600 bg-[#2c2c2c] px-3 py-2 text-white focus:outline-none focus:ring focus:border-blue-500"
-            placeholder="Video description"
-            :disabled="loading"
-          ></textarea>
+            placeholder="Video description" :disabled="loading"></textarea>
         </div>
 
         <!-- Tags -->
         <div>
-          <label class="block mb-1 text-sm font-medium"
-            >Tags (comma separated)</label
-          >
-          <input
-            v-model="tags"
-            type="text"
+          <label class="block mb-1 text-sm font-medium">Tags (comma separated)</label>
+          <input v-model="tags" type="text"
             class="w-full rounded-lg border border-gray-600 bg-[#2c2c2c] px-3 py-2 text-white focus:outline-none focus:ring focus:border-blue-500"
-            placeholder="e.g. travel, summer, vlog"
-            :disabled="loading"
-          />
+            placeholder="e.g. travel, summer, vlog" :disabled="loading" />
         </div>
 
         <!-- Category -->
         <div>
           <label class="block mb-1 text-sm font-medium">Category</label>
-          <select
-            v-model="category"
+          <select v-model="category"
             class="w-full rounded-lg border border-gray-600 bg-[#2c2c2c] px-3 py-2 text-white focus:outline-none focus:ring focus:border-blue-500"
-            :disabled="loading"
-          >
+            :disabled="loading">
             <option value="" disabled>Select a category</option>
             <option v-for="cat in categories" :key="cat.id" :value="cat.id">
               {{ cat.name }}
@@ -288,31 +261,20 @@ const handleUpload = async () => {
         <!-- Thumbnail Upload -->
         <div>
           <label class="block mv-2 text-sm font-medium">Thumbnail</label>
-          <input
-            type="file"
-            accept="image/*"
-            @change="handleThumbnailChange"
+          <input type="file" accept="image/*" @change="handleThumbnailChange"
             class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200"
-            :disabled="loading"
-          />
+            :disabled="loading" />
         </div>
 
         <!-- Submit -->
         <div class="flex justify-end pt-2">
           <div class="flex gap-2 items-center">
-            <button
-              type="button"
-              class="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-400"
-              @click="emit('update:show', false)"
-              :disabled="loading"
-            >
+            <button type="button" class="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-400"
+              @click="emit('update:show', false)" :disabled="loading">
               Cancel
             </button>
-            <button
-              type="submit"
-              class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700"
-              :disabled="loading"
-            >
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700"
+              :disabled="loading">
               Upload
             </button>
           </div>

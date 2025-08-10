@@ -3,13 +3,14 @@ import { getUser, type TUser } from "@/utils/get-user";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import UserAvatar from "./UserAvatar.vue";
+import { interval } from "date-fns";
 
 const router = useRouter();
 
 const user = ref<TUser|null>(null);
 const username = ref<string | undefined>("");
 const profileUrl = ref<string | undefined>("");
-const userRole = ref<string | undefined>("user");
+const userRole = ref<string | undefined>("");
 const userEmail = ref<string | undefined>("");
 const joinedAt = ref<string | undefined>();
 const loading = ref(true);
@@ -17,21 +18,21 @@ const loading = ref(true);
 const showUserInfo = ref(false);
 
 onMounted(async () => {
-  try {
-    const fetchedUser = await getUser();
-    if (fetchedUser) {
-      user.value = fetchedUser;
-      username.value = fetchedUser.username;
-      profileUrl.value = fetchedUser?.photoUrl;
-      userRole.value = fetchedUser.dbUser.role;
-      userEmail.value = fetchedUser.dbUser.email;
-      joinedAt.value = fetchedUser.dbUser.joinedAt;
+    try {
+      const fetchedUser = await getUser();
+      if (fetchedUser) {
+        user.value = fetchedUser;
+        username.value = fetchedUser.username;
+        profileUrl.value = fetchedUser?.photoUrl;
+        userRole.value = fetchedUser.dbUser.role;
+        userEmail.value = fetchedUser.dbUser.email;
+        joinedAt.value = fetchedUser.dbUser.joinedAt;
+      }
+    } catch (err) {
+      console.error("Failed to load user:", err);
+    } finally {
+      loading.value = false;
     }
-  } catch (err) {
-    console.error("Failed to load user:", err);
-  } finally {
-    loading.value = false;
-  }
 });
 
 const toggleUserInfo = () => {
@@ -73,13 +74,12 @@ const goToDashboard = () => {
 
     <!-- Right side controls -->
     <div class="flex items-center gap-6 relative">
-      <!-- Admin Dashboard -->
       <button
-        v-if="!loading && userRole === 'admin'"
+        v-if="!loading && userRole"
         @click="goToDashboard"
         class="bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-700 hover:to-purple-600 text-white text-xs rounded-sm px-4 py-1 border border-purple-300 cursor-pointer"
       >
-        Dashboard
+        Go to admin dashboard
       </button>
 
       <!-- Sign In -->
@@ -106,6 +106,12 @@ const goToDashboard = () => {
           :username="username"
         />
       </div>
+
+      <div v-if="loading" class="flex items-center gap-5">
+          <div class="h-8 w-24 rounded-sm bg-gray-800 animate-pulse"></div>
+          <div class="h-9 w-9 rounded-full bg-gray-800 animate-pulse"></div>
+      </div>
+    
     </div>
   </nav>
 </template>

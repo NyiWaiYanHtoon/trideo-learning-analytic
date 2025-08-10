@@ -75,5 +75,11 @@ document.addEventListener("click", onClickOutside);
           :username="username"
         />
       </div>
+
+       <div v-if="loading" class="flex items-center gap-5">
+          <div class="h-8 w-24 rounded-sm bg-gray-800 animate-pulse"></div>
+          <div class="h-9 w-9 rounded-full bg-gray-800 animate-pulse"></div>
+      </div>
+
   </nav>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { User, Mail, Calendar, Shield, LogOut } from 'lucide-vue-next'
 import { formatDate } from '@/utils/formatDate'
 import { handleSignOut } from '@/utils/handle-signout';
@@ -16,6 +16,7 @@ const props = defineProps<{
 const router = useRouter();
 const imageError= ref(false);
 const showUserInfo = ref(false)
+const root = ref<HTMLElement | null>(null) 
 
 function toggleUserInfo() {
   showUserInfo.value = !showUserInfo.value
@@ -25,10 +26,24 @@ const handleImageError= ()=>{
   imageError.value= true;
 }
 
+const handleClickOutside= (event: MouseEvent)=> {
+  if (root.value && !root.value.contains(event.target as Node)) {
+    showUserInfo.value = false;
+  }
+}
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
+
 </script>
 
 <template>
-  <div class="relative inline-block text-left" @click="toggleUserInfo">
+  <div class="relative inline-block text-left" @click="toggleUserInfo" ref="root">
     <!-- Avatar or Fallback Initial -->
     <template v-if="profileUrl &&  !imageError">
       <img
@@ -51,7 +66,7 @@ const handleImageError= ()=>{
     <transition name="fade">
   <div
     v-if="showUserInfo"
-    class="absolute top-full right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded shadow-lg text-gray-200 z-50 py-3"
+    class="absolute top-full right-0 mt-2 w-64 bg-gray-900 border border-gray-700 rounded shadow-lg text-gray-200 z-50 py-3"
     @click.stop
   >
     <!-- Header: Username -->

@@ -13,6 +13,7 @@ import {
 import type { ChartData, ChartOptions } from 'chart.js'
 import type { PropType } from 'vue'
 import SimplePaginition from './SimplePaginition.vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   timeframe: {
@@ -20,7 +21,7 @@ const props = defineProps({
     required: true
   }
 })
-
+const router= useRouter();
 type TVideosWithStats = {
   videos: {
     video: {
@@ -145,9 +146,9 @@ onMounted(() => fetchTopVideos())
 </script>
 
 <template>
-  <div class="w-full xl:grid gap-6 xl:grid-cols-[2fr_1fr] p-6">
+  <div class="w-full xl:grid gap-6 xl:grid-cols-[2fr_1fr] p-3">
     <!-- Chart Panel -->
-    <div class="bg-[#1e1e1e] rounded-xl border border-[#2f2f2f] p-4 shadow">
+    <div class="bg-[#1e1e1e] rounded-sm border border-[#2f2f2f] p-4 shadow">
       <h2 class="text-lg font-semibold text-purple-400 mb-4">Video Engagement Chart</h2>
 
       <div v-if="isLoadingChart" class="text-center text-purple-300 animate-pulse py-12">
@@ -156,10 +157,10 @@ onMounted(() => fetchTopVideos())
       <div v-else-if="chartError" class="text-center text-red-400">{{ chartError }}</div>
       <Bar v-else :data="chartData" :options="chartOptions" />
 
-      <div v-if="totalVideos > 5" class="mt-4">
+      <div v-if="totalVideos > 5" class="mt-4 w-full flex items-center justify-end">
         <SimplePaginition
           :page="page"
-          :setPage="p => page = p"
+          :setPage=" ( p ) => page = p"
           :disableBack="page <= 1"
           :disableForward="page >= Math.ceil(totalVideos / 5)"
           :isDark="true"
@@ -168,13 +169,13 @@ onMounted(() => fetchTopVideos())
     </div>
 
     <!-- Sidebar Lists -->
-    <div class="space-y-6 md:mt-0 mt-4">
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl shadow p-4">
+    <div class="space-y-9 md:mt-0 py-3">
+      <div class="bg-[#1e1e1e] border border-[#333] rounded-sm shadow p-4">
         <h3 class="text-md font-bold text-white mb-2">Most Viewed</h3>
         <div v-if="isLoadingList" class="text-purple-300 animate-pulse text-center">Loading...</div>
         <div v-else-if="listError" class="text-red-400">{{ listError }}</div>
         <ul v-else class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
-          <li v-for="video in mostViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded">
+          <li v-for="video in mostViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded-md cursor-pointer" @click="router.push(`/video/${video.id}`)">
             <img :src="video.thumbnailUrl" alt="thumb" class="w-16 h-10 object-cover rounded" />
             <div>
               <p class="text-sm font-semibold text-white truncate">{{ video.title }}</p>
@@ -184,10 +185,10 @@ onMounted(() => fetchTopVideos())
         </ul>
       </div>
 
-      <div class="bg-[#1e1e1e] border border-[#333] rounded-xl shadow p-4">
+      <div class="bg-[#1e1e1e] border border-[#333] rounded-sm shadow p-4">
         <h3 class="text-md font-bold text-white mb-2">Least Viewed</h3>
         <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
-          <li v-for="video in leastViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded">
+          <li v-for="video in leastViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded-md cursor-pointer" @click="router.push(`/video/${video.id}`)">
             <img :src="video.thumbnailUrl" alt="thumb" class="w-16 h-10 object-cover rounded" />
             <div>
               <p class="text-sm font-semibold text-white truncate">{{ video.title }}</p>

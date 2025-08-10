@@ -21,38 +21,38 @@ const timeframe = ref<TTimeFrame>('all');
       
       <!-- Timeframe Filter -->
       <div class="flex flex-wrap gap-3">
-        <button
+        <Button
           v-for="option in ['all', 'today', 'week']"
           :key="option"
           @click="timeframe = option as TTimeFrame"
-          class="px-5 py-2 rounded-full text-sm font-medium capitalize transition border shadow-sm"
+          class="px-3 py-1 rounded-full text-sm font-medium capitalize transition border shadow-sm"
           :class="timeframe === option
             ? 'bg-white text-black border-white'
             : 'bg-[#1a1a1a] text-gray-400 border-[#333] hover:bg-[#222] hover:text-purple-400'"
         >
           {{ option === 'all' ? 'All Time' : option === 'week' ? 'This Week' : 'Today' }}
-        </button>
+        </Button>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex flex-wrap gap-3">
         <!-- Browse Videos -->
-        <button
+        <Button
           @click="() => router.push({ name: 'Home' })"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-md border border-[#333] bg-gradient-to-r from-[#1f1f1f] to-[#191919] text-white text-sm font-medium hover:text-purple-400 hover:from-[#252525] hover:to-[#1f1f1f] transition-colors"
+          class="flex items-center gap-2 px-5 py-2 px-1 rounded-md border border-[#333] bg-gradient-to-r from-[#1f1f1f] to-[#191919] text-white text-sm font-medium hover:text-purple-400 hover:from-[#252525] hover:to-[#1f1f1f] transition-colors"
         >
           <Film class="w-4 h-4" />
           <span>Browse Videos</span>
-        </button>
+        </Button>
 
         <!-- Upload Button -->
-        <button
+        <Button
           @click="showDialog = true"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#333] bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-sm font-semibold transition-colors"
+          class="flex items-center gap-2 px-5 py-2 px-1 rounded-full border border-[#333] bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-sm font-semibold transition-colors"
         >
           <Plus class="w-4 h-4" />
           <span>Upload</span>
-        </button>
+        </Button>
       </div>
     </div>
 

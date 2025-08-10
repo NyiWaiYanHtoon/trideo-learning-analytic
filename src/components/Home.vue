@@ -126,10 +126,9 @@ const handleClick = async (videoId: string) => {
   >
     <SimplePaginition
       :page="page"
-      :setPage="setPage"
+      :setPage="(p: number) => page = p"
       :disableBack="page <= 1"
       :disableForward="page >= Math.ceil(total / pageSize)"
-      :isDark="true"
     />
   </div>
 </template>

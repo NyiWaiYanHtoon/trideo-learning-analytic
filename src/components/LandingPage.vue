@@ -1,18 +1,16 @@
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 
-import { useRouter } from 'vue-router';
-
-  const router= useRouter();
-  const handleBrowse= ()=>{
-    router.push('/home')
-  }
-
+const router = useRouter();
+const handleBrowse = () => {
+  router.push("/home");
+};
 </script>
 
 <template>
   <div class="bg-gray-950 text-white font-sans min-h-[82vh] flex flex-col">
     <!-- Hero Section -->
-    <section class="py-11 px-6 text-center flex-grow">
+    <section class="py-7 px-6 text-center flex-grow">
       <div class="max-w-3xl mx-auto space-y-8">
         <img
           src="../../public/images/landing-image.svg"
@@ -27,16 +25,24 @@ import { useRouter } from 'vue-router';
         <p class="text-gray-300 text-lg sm:text-xl max-w-xl mx-auto">
           Welcome to <span class="text-purple-400 font-semibold">Trideo</span> —
           a modern learning platform where you can watch lessons on React,
-          Node.js, Next.js Flutter and more. Learn and build job-ready skills, faster.
+          Node.js, Next.js Flutter and more. Learn and build job-ready skills,
+          faster.
         </p>
         <button
           class="bg-purple-600 hover:bg-purple-700 transition-colors text-white px-8 py-4 rounded-lg font-semibold text-lg shadow-md cursor-pointer"
           @click="handleBrowse"
-          >
+        >
           Start Learning Now
         </button>
       </div>
     </section>
+
+    <!-- Demo Notice -->
+    <div
+      class="my-0 bg-yellow-100 text-yellow-800 text-sm px-4 py-2 rounded-md max-w-xl mx-auto border border-yellow-300"
+    >
+      🔒 For demo purposes, dashboard access is granted to all users regardless of role.
+    </div>
 
     <!-- Footer -->
     <footer class="text-white py-6 px-6 text-center">
@@ -55,7 +61,6 @@ import { useRouter } from 'vue-router';
         </p>
       </div>
     </footer>
-
   </div>
 </template>
 
