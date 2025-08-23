@@ -177,7 +177,7 @@ onMounted(() => fetchTopVideos())
         <ul v-else class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
           <li v-for="video in mostViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded-md cursor-pointer" @click="router.push(`/video/${video.id}`)">
             <img :src="video.thumbnailUrl" alt="thumb" class="w-16 h-10 object-cover rounded" />
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-white truncate">{{ video.title }}</p>
               <p class="text-xs text-gray-400">{{ new Date(video.createdAt).toLocaleDateString() }}</p>
             </div>
@@ -190,7 +190,7 @@ onMounted(() => fetchTopVideos())
         <ul class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
           <li v-for="video in leastViewedVideos" :key="video.id" class="flex items-center gap-3 hover:bg-purple-900/40 p-2 rounded-md cursor-pointer" @click="router.push(`/video/${video.id}`)">
             <img :src="video.thumbnailUrl" alt="thumb" class="w-16 h-10 object-cover rounded" />
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-white truncate">{{ video.title }}</p>
               <p class="text-xs text-gray-400">{{ new Date(video.createdAt).toLocaleDateString() }}</p>
             </div>

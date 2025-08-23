@@ -9,6 +9,7 @@ type TOverallStats = {
   visits: number;
   views: number;
   completions: number;
+  totalVideoCount: number;
 };
 
 const stats = ref<TOverallStats | null>(null);
@@ -25,14 +26,14 @@ watchEffect(async () => {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeframe: props.timeframe })
+        body: JSON.stringify({ timeframe: props.timeframe }),
       }
     );
 
     if (!res.ok) throw new Error('Failed to fetch stats');
 
     const data: TOverallStats = await res.json();
-    stats.value = data || { visits: 0, views: 0, completions: 0 };
+    stats.value = data || { visits: 0, views: 0, completions: 0, totalVideoCount: 0 };
   } catch (err) {
     console.error('Failed to fetch stats:', err);
     error.value = true;
@@ -58,7 +59,7 @@ const completionRate = computed(() =>
   <div class="w-full px-2 sm:px-6 py-8 text-white space-y-6">
     <!-- Loading Skeleton -->
     <div v-if="loading" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
-      <div v-for="n in 5" :key="n" class="bg-gray-800/70 border border-gray-700 rounded-2xl p-6 shadow-inner">
+      <div v-for="n in 6" :key="n" class="bg-gray-800/70 border border-gray-700 rounded-2xl p-6 shadow-inner">
         <div class="h-4 bg-gray-600/70 w-1/3 mb-3 rounded"></div>
         <div class="h-6 bg-gray-700/80 w-2/3 rounded"></div>
       </div>
@@ -71,21 +72,23 @@ const completionRate = computed(() =>
 
     <!-- Stats -->
     <div v-else-if="stats" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      <div v-for="(value, key) in [
+      <div
+        v-for="stat in [
+          { title: 'Total Videos', value: stats.totalVideoCount },
           { title: 'Visited', value: stats.visits },
           { title: 'Viewed', value: stats.views },
           { title: 'Completed', value: stats.completions },
           { title: 'View Rate', value: viewRate + '%' },
           { title: 'Completion Rate', value: completionRate + '%' }
         ]"
-        :key="value.title"
+        :key="stat.title"
         class="bg-gray-800/70 border border-gray-700 rounded-2xl p-6 shadow-md hover:shadow-lg transition"
       >
         <h3 class="text-sm text-gray-400 mb-1 tracking-wide uppercase">
-          {{value.title }}
+          {{ stat.title }}
         </h3>
         <p class="text-3xl font-bold text-white tracking-tight">
-          {{ value.value }}
+          {{ stat.value }}
         </p>
       </div>
     </div>

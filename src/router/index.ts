@@ -65,7 +65,8 @@ router.beforeEach(async (to, from, next) => {
 
   if (requiresAuth) {
     try {
-      const user: TUser | null= await getUser()
+      const user: TUser | null= await getUser();
+      console.log("User: ", user);
       if (!user) return next("/Auth");
       
       if (to.fullPath.startsWith("/admin")) {

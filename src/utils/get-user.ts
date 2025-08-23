@@ -13,6 +13,11 @@ export const getUser= async (): Promise< TUser | null>=>{
     const res = await fetch(`${import.meta.env.VITE_EXPRESS_SERVER_URL}/api/auth/me`, {
       credentials: 'include',
     });
+    if(!res.ok) {
+      const text= await res.json();
+      console.log(text);
+      return null;
+    }
     const data = await res.json();
     return data.user;
   } catch (error) {
